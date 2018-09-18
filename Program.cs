@@ -34,40 +34,47 @@ namespace MopsKiller
         {
             try
             {
-                var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId);
-                Console.WriteLine(string.Join("\n", MopsBot.Select(x => $"{x.ProcessName}: {x.Id}")));
-                /*using (var process = new System.Diagnostics.Process())
+                var dotnetProcesses = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId);
+                Console.WriteLine("dotnet processes:\n" + string.Join("\n", dotnetProcesses.Select(x => $"{x.ProcessName}: {x.Id}, handles: {x.HandleCount}")));
+
+                /*foreach (var subProcess in dotnetProcesses)
                 {
-                    process.StartInfo.FileName = "/bin/bash";
-                    process.StartInfo.Arguments = $"-c \"ls -lisa /proc/{ProcessId}/fd | wc -l\"";
-                    process.StartInfo.RedirectStandardOutput = true;
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.CreateNoWindow = true;
+                    using (var process = new System.Diagnostics.Process())
+                    {
+                        process.StartInfo.FileName = "/bin/bash";
+                        process.StartInfo.Arguments = $"-c \"ls -lisa /proc/{subProcess.Id}/fd | wc -l\"";
+                        process.StartInfo.RedirectStandardOutput = true;
+                        process.StartInfo.UseShellExecute = false;
+                        process.StartInfo.CreateNoWindow = true;
 
-                    process.Start();
-                    process.WaitForExit();
+                        process.Start();
+                        process.WaitForExit();
 
-                    string result = process.StandardOutput.ReadToEnd();
-                    int openFiles = Convert.ToInt32(result);
-                    Console.WriteLine("\n" + System.DateTime.Now + $" open files were {openFiles}");
-                   
-                    if (OpenFilesCount == openFiles){
-                        if(++OpenFilesRepetition == OpenFilesRepetitionThreshold){
-                            Console.WriteLine("\nShutting down due to 5 repetitions!");
+                        string result = process.StandardOutput.ReadToEnd();
+                        int openFiles = Convert.ToInt32(result);
+                        Console.WriteLine("\n" + System.DateTime.Now + $" open files were {openFiles}");
+
+                        if (OpenFilesCount == openFiles)
+                        {
+                            if (++OpenFilesRepetition == OpenFilesRepetitionThreshold)
+                            {
+                                Console.WriteLine("\nShutting down due to 5 repetitions!");
+                                Environment.Exit(-1);
+                            }
+                        }
+
+                        else
+                            OpenFilesRepetition = 0;
+
+
+                        if (OpenFilesCount > 600)
+                        {
+                            Console.WriteLine("\nShutting down due to too many open files!");
                             Environment.Exit(-1);
                         }
-                    }
 
-                    else
-                        OpenFilesRepetition = 0;
-                    
-                    
-                    if (OpenFilesCount > 600){
-                        Console.WriteLine("\nShutting down due to too many open files!");
-                        Environment.Exit(-1);
+                        OpenFilesCount = openFiles;
                     }
-
-                    OpenFilesCount = openFiles;
                 }*/
 
 

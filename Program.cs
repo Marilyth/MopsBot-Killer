@@ -25,7 +25,7 @@ namespace MopsKiller
         {
             ProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
 
-            openFileChecker = new System.Threading.Timer(checkOpenFiles, null, 0, 60000);
+            openFileChecker = new System.Threading.Timer(checkOpenFiles, null, 60000, 60000);
 
             await Task.Delay(-1);
         }

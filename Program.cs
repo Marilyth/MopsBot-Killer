@@ -34,48 +34,30 @@ namespace MopsKiller
         {
             try
             {
-                var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140).First();
-                Console.WriteLine("MopsBot: " + $"{MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}");
-
-                /*using (var process = new System.Diagnostics.Process())
+                using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140).First())
                 {
-                    process.StartInfo.FileName = "/bin/bash";
-                    process.StartInfo.Arguments = $"-c \"ls -lisa /proc/{MopsBot.Id}/fd | wc -l\"";
-                    process.StartInfo.RedirectStandardOutput = true;
-                    process.StartInfo.UseShellExecute = false;
-                    process.StartInfo.CreateNoWindow = true;
+                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}");
 
-                    process.Start();
-                    process.WaitForExit();
+                    if (MopsBot.HandleCount > 600)
+                    {
+                        Console.WriteLine($"\nShutting down due to {MopsBot.HandleCount} open files!");
+                        MopsBot.Kill();
+                    }
 
-                    string result = process.StandardOutput.ReadToEnd();
-                    int openFiles = Convert.ToInt32(result);
-                    Console.WriteLine("\n" + System.DateTime.Now + $" open files were {openFiles}");
-
-                    if (OpenFilesCount == openFiles)
+                    else if (OpenFilesCount == MopsBot.HandleCount)
                     {
                         if (++OpenFilesRepetition == OpenFilesRepetitionThreshold)
                         {
                             Console.WriteLine("\nShutting down due to 5 repetitions!");
-                            Environment.Exit(-1);
+                            MopsBot.Kill();
                         }
                     }
 
                     else
                         OpenFilesRepetition = 0;
 
-
-                    if (OpenFilesCount > 600)
-                    {
-                        Console.WriteLine("\nShutting down due to too many open files!");
-                        Environment.Exit(-1);
-                    }
-
-                    OpenFilesCount = openFiles;
-                }*/
-
-
-
+                    OpenFilesCount = MopsBot.HandleCount;
+                }
             }
             catch (Exception e)
             {

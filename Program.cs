@@ -19,7 +19,7 @@ namespace MopsKiller
 
         //Open file handling
         private int ProcessId, OpenFilesCount, OpenFilesRepetition, LimitExceededCount;
-        private static int REPETITIONTHRESHOLD = 10, OPENFILESLIMIT = 600;
+        private static int REPETITIONTHRESHOLD = 10, OPENFILESLIMIT = 800;
 
         private async Task Start()
         {

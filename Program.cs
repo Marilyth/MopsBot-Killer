@@ -19,7 +19,7 @@ namespace MopsKiller
 
         //Open file handling
         private int ProcessId, OpenFilesCount, OpenFilesRepetition, LimitExceededCount;
-        private static int REPETITIONTHRESHOLD = 10, OPENFILESLIMIT = 800;
+        private static int REPETITIONTHRESHOLD = 10, OPENFILESLIMIT = 800, COUNTDOWN = 2;
 
         private async Task Start()
         {
@@ -40,8 +40,12 @@ namespace MopsKiller
 
                     if (MopsBot.HandleCount >= OPENFILESLIMIT)
                     {
-                        Console.WriteLine($"\nShutting down due to {MopsBot.HandleCount} open files!");
-                        MopsBot.Kill();
+                        if(--COUNTDOWN == 0){
+                            Console.WriteLine($"\nShutting down due to {MopsBot.HandleCount} open files!");
+                            MopsBot.Kill();
+                        }
+                    } else {
+                        COUNTDOWN = 2;
                     }
 
                     if (OpenFilesCount == MopsBot.HandleCount)

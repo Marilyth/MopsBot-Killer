@@ -45,7 +45,7 @@ namespace MopsKiller
                             MopsBot.Kill();
                         }
                     } else {
-                        COUNTDOWN = 2;
+                        COUNTDOWN = 3;
                     }
 
                     if (OpenFilesCount == MopsBot.HandleCount)

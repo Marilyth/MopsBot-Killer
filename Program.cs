@@ -36,7 +36,7 @@ namespace MopsKiller
             {
                 using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140).First())
                 {
-                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}");
+                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, threads: {MopsBot.Threads}");
 
                     if (MopsBot.HandleCount >= OPENFILESLIMIT)
                     {

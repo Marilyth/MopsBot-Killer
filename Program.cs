@@ -74,8 +74,8 @@ namespace MopsKiller
             using (var prc = new System.Diagnostics.Process())
             {
                 prc.StartInfo.RedirectStandardOutput = true;
-                prc.StartInfo.FileName = "netstat";
-                prc.StartInfo.Arguments = $"-peanut | grep dotnet | grep CLOSE | wc -l";
+                prc.StartInfo.FileName = "/bin/bash";
+                prc.StartInfo.Arguments = $"-c netstat -peanut | grep dotnet | grep CLOSE | wc -l";
 
                 prc.Start();
 

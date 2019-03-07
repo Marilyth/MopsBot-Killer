@@ -19,7 +19,7 @@ namespace MopsKiller
 
         //Open file handling
         private int ProcessId, OpenFilesCount, OpenFilesRepetition, LimitExceededCount;
-        private static int REPETITIONTHRESHOLD = 10, OPENFILESLIMIT = 550, COUNTDOWN = 3;
+        private static int REPETITIONTHRESHOLD = 10, OPENFILESLIMIT = 550, OPENSOCKETSLIMIT = 4, COUNTDOWN = 3;
 
         private async Task Start()
         {
@@ -36,12 +36,13 @@ namespace MopsKiller
             {
                 using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140).First())
                 {
-                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {GetCloseWaitSockets()}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}");
+                    int openSockets = GetCloseWaitSockets();
+                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}");
 
-                    if (MopsBot.HandleCount >= OPENFILESLIMIT)
+                    if (MopsBot.HandleCount >= OPENFILESLIMIT || openSockets > OPENSOCKETSLIMIT)
                     {
                         if(--COUNTDOWN == 0){
-                            Console.WriteLine($"\nShutting down due to {MopsBot.HandleCount} open files!");
+                            Console.WriteLine($"\nShutting down due to {MopsBot.HandleCount} open files / {openSockets} open sockets!");
                             MopsBot.Kill();
                         }
                     } else {
@@ -70,7 +71,7 @@ namespace MopsKiller
             }
         }
 
-        private string GetCloseWaitSockets(){
+        private int GetCloseWaitSockets(){
             using (var prc = new System.Diagnostics.Process())
             {
                 prc.StartInfo.RedirectStandardOutput = true;
@@ -79,7 +80,7 @@ namespace MopsKiller
 
                 prc.Start();
 
-                string count = prc.StandardOutput.ReadToEnd();
+                int count = int.Parse(prc.StandardOutput.ReadToEnd());
 
                 prc.WaitForExit();
 

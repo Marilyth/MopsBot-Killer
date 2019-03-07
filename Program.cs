@@ -70,7 +70,7 @@ namespace MopsKiller
             }
         }
 
-        private int GetCloseWaitSockets(){
+        private string GetCloseWaitSockets(){
             using (var prc = new System.Diagnostics.Process())
             {
                 prc.StartInfo.RedirectStandardOutput = true;
@@ -79,7 +79,7 @@ namespace MopsKiller
 
                 prc.Start();
 
-                int count = int.Parse(prc.StandardOutput.ReadToEnd());
+                string count = prc.StandardOutput.ReadToEnd();
 
                 prc.WaitForExit();
 

@@ -19,7 +19,7 @@ namespace MopsKiller
 
         //Open file handling
         private int ProcessId, OpenFilesCount, OpenFilesRepetition, LimitExceededCount;
-        private static int REPETITIONTHRESHOLD = 10, OPENFILESLIMIT = 550, OPENSOCKETSLIMIT = 4, COUNTDOWN = 3;
+        private static int REPETITIONTHRESHOLD = 10, OPENFILESLIMIT = 550, OPENSOCKETSLIMIT = 4, COUNTDOWN = 6;
 
         private async Task Start()
         {
@@ -46,7 +46,7 @@ namespace MopsKiller
                             MopsBot.Kill();
                         }
                     } else {
-                        COUNTDOWN = 3;
+                        COUNTDOWN = 6;
                     }
 
                     if (OpenFilesCount == MopsBot.HandleCount)

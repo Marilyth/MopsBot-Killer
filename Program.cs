@@ -25,7 +25,7 @@ namespace MopsKiller
         {
             ProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
 
-            openFileChecker = new System.Threading.Timer(checkOpenFiles, null, 60000, 60000);
+            openFileChecker = new System.Threading.Timer(checkOpenFiles, null, 30000, 30000);
 
             await Task.Delay(-1);
         }
@@ -36,7 +36,7 @@ namespace MopsKiller
             {
                 using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140).First())
                 {
-                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}");
+                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {GetCloseWaitSockets()}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}");
 
                     if (MopsBot.HandleCount >= OPENFILESLIMIT)
                     {
@@ -67,6 +67,23 @@ namespace MopsKiller
             {
                 Console.WriteLine("\n[FILE READING ERROR]: " + System.DateTime.Now + $" {e.Message}\n{e.StackTrace}");
                 //Environment.Exit(-1);
+            }
+        }
+
+        private int GetCloseWaitSockets(){
+            using (var prc = new System.Diagnostics.Process())
+            {
+                prc.StartInfo.RedirectStandardOutput = true;
+                prc.StartInfo.FileName = "netstat";
+                prc.StartInfo.Arguments = $"-peanut | grep dotnet | grep CLOSE | wc -l";
+
+                prc.Start();
+
+                int count = int.Parse(prc.StandardOutput.ReadToEnd());
+
+                prc.WaitForExit();
+
+                return count;
             }
         }
     }

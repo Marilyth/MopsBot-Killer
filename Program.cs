@@ -39,7 +39,7 @@ namespace MopsKiller
                     int openSockets = GetCloseWaitSockets();
                     Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}");
 
-                    if (MopsBot.HandleCount >= OPENFILESLIMIT || openSockets >= OPENSOCKETSLIMIT)
+                    if (MopsBot.HandleCount >= OPENFILESLIMIT /*|| openSockets >= OPENSOCKETSLIMIT*/)
                     {
                         if(--COUNTDOWN == 0){
                             Console.WriteLine($"\nShutting down due to {MopsBot.HandleCount} open files / {openSockets} open sockets!");

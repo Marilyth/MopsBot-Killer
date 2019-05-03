@@ -100,8 +100,6 @@ namespace MopsKiller
 
                 prc.Start();
 
-                int count = int.Parse(prc.StandardOutput.ReadToEnd());
-
                 prc.WaitForExit();
             }       
         }

@@ -62,6 +62,9 @@ namespace MopsKiller
                         OpenFilesRepetition = 0;
 
                     OpenFilesCount = MopsBot.HandleCount;
+
+                    if(openSockets > 0)
+                        CloseCloseWaitSockets();
                 }
             }
             catch (Exception e)
@@ -86,6 +89,21 @@ namespace MopsKiller
 
                 return count;
             }
+        }
+
+        private void CloseCloseWaitSockets(){
+            using (var prc = new System.Diagnostics.Process())
+            {
+                prc.StartInfo.RedirectStandardOutput = true;
+                prc.StartInfo.FileName = "/bin/bash";
+                prc.StartInfo.Arguments = $"-c \"/usr/applications/kill-close-wait-connections/kill_close_wait_connections.pl\"";
+
+                prc.Start();
+
+                int count = int.Parse(prc.StandardOutput.ReadToEnd());
+
+                prc.WaitForExit();
+            }       
         }
     }
 }

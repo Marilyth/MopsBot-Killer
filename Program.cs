@@ -40,6 +40,9 @@ namespace MopsKiller
                 {
                     int openSockets = GetCloseWaitSockets();
                     Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}");
+
+                    //Reset plot if 1 day old
+                    if(plot.PlotDataPoints.Count > 23040) plot = new DatePlot("MopsKiller", multipleLines: true);
                     plot.AddValueSeperate("RAM", (MopsBot.WorkingSet64/1024)/1024);
                     plot.AddValueSeperate("Handles", MopsBot.HandleCount);
                     plot.AddValueSeperate("Waiting-Sockets", openSockets);
@@ -51,6 +54,8 @@ namespace MopsKiller
                         if(--COUNTDOWN == 0){
                             Console.WriteLine($"\nShutting down due to {MopsBot.HandleCount} open files / {openSockets} open sockets!");
                             MopsBot.Kill();
+                            plot.AddValueSeperate("Kill", MopsBot.HandleCount);
+                            plot.AddValueSeperate("Kill", 0);
                         }
                     } else {
                         COUNTDOWN = 6;

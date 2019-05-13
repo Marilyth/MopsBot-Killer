@@ -6,4 +6,8 @@
     <RootNamespace>MopsBot_Killer</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="OxyPlot.Core" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>

@@ -20,11 +20,13 @@ namespace MopsKiller
         //Open file handling
         private int ProcessId, OpenFilesCount, OpenFilesRepetition, LimitExceededCount;
         private static int REPETITIONTHRESHOLD = 10, OPENFILESLIMIT = 550, OPENSOCKETSLIMIT = 4, COUNTDOWN = 6;
+        private static DatePlot plot;
 
         private async Task Start()
         {
             ProcessId = System.Diagnostics.Process.GetCurrentProcess().Id;
-
+            
+            plot = new DatePlot("MopsKiller", multipleLines: true);
             openFileChecker = new System.Threading.Timer(checkOpenFiles, null, 30000, 30000);
 
             await Task.Delay(-1);
@@ -38,6 +40,11 @@ namespace MopsKiller
                 {
                     int openSockets = GetCloseWaitSockets();
                     Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}");
+                    plot.AddValueSeperate("RAM", (MopsBot.WorkingSet64/1024)/1024);
+                    plot.AddValueSeperate("Handles", MopsBot.HandleCount);
+                    plot.AddValueSeperate("Waiting-Sockets", openSockets);
+                    plot.AddValueSeperate("Threads", MopsBot.Threads.Count);
+                    plot.DrawPlot();
 
                     if (MopsBot.HandleCount >= OPENFILESLIMIT /*|| openSockets >= OPENSOCKETSLIMIT*/)
                     {

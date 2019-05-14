@@ -89,7 +89,7 @@ namespace MopsKiller
         {
             using (var stream = File.Create($"//var//www//html//StreamCharts//MopsKillerPlot.pdf"))
             {
-                var pdfExporter = new PdfExporter { Width = 800, Height = 400 };
+                var pdfExporter = new PdfExporter { Width = 800 + ((PlotDataPoints.Count)/4), Height = 400 };
                 pdfExporter.Export(viewerChart, stream);
             }
         }

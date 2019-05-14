@@ -54,8 +54,9 @@ namespace MopsKiller
                         if(--COUNTDOWN == 0){
                             Console.WriteLine($"\nShutting down due to {MopsBot.HandleCount} open files / {openSockets} open sockets!");
                             MopsBot.Kill();
-                            plot.AddValueSeperate("Kill", MopsBot.HandleCount, relative: false);
-                            plot.AddValueSeperate("Kill", 0, relative: false);
+                            plot.AddValueSeperate("Mops-Killed", 0, relative: false);
+                            plot.AddValueSeperate("Mops-Killed", MopsBot.HandleCount, relative: false);
+                            plot.AddValueSeperate("Mops-Killed", 0, relative: false);
                         }
                     } else {
                         COUNTDOWN = 6;

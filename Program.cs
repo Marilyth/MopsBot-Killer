@@ -39,7 +39,7 @@ namespace MopsKiller
                 using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140).First())
                 {
                     int openSockets = GetCloseWaitSockets();
-                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}");
+                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}\nRuntime: {DateTime.Now - MopsBot.StartTime} ago, Last log entry: {DateTime.Now - GetLastLogEntry()} ago");
 
                     //Reset plot if 1 day old
                     if(plot.PlotDataPoints.Count > 23040) plot = new DatePlot("MopsKiller", relativeTime: false, multipleLines: true);
@@ -76,8 +76,9 @@ namespace MopsKiller
 
                     OpenFilesCount = MopsBot.HandleCount;
 
-                    if(openSockets > 0)
-                        CloseCloseWaitSockets();
+                    if(openSockets > 0){
+                        //CloseCloseWaitSockets();
+                    }
                 }
             }
             catch (Exception e)
@@ -102,6 +103,10 @@ namespace MopsKiller
 
                 return count;
             }
+        }
+
+        private DateTime GetLastLogEntry(){
+            return File.GetLastWriteTime("/usr/applications/MopsBot/mopsdata/log");
         }
 
         private void CloseCloseWaitSockets(){

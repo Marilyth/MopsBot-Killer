@@ -36,7 +36,7 @@ namespace MopsKiller
         {
             try
             {
-                using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140 && (x.WorkingSet64/1024)/1024 > 250).First())
+                using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140).OrderByDescending(x => x.WorkingSet64).First())
                 {
                     int openSockets = GetCloseWaitSockets();
                     Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}, Runtime: {(DateTime.Now - MopsBot.StartTime).ToString(@"h\h\:m\m\:s\s")}, LogEntry: {(DateTime.Now - GetLastLogEntry()).ToString(@"m\m\:s\s")} ago");

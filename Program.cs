@@ -18,8 +18,10 @@ namespace MopsKiller
         private System.Threading.Timer openFileChecker;
 
         //Open file handling
-        private int ProcessId, OpenFilesCount, OpenFilesRepetition, LimitExceededCount;
-        private static int REPETITIONTHRESHOLD = 10, OPENFILESLIMIT = 550, OPENSOCKETSLIMIT = 4, COUNTDOWN = 6;
+        private int ProcessId, OpenFilesCount, RAMRepetition, LimitExceededCount;
+        private long RAM;
+        private static int REPETITIONTHRESHOLD = 20, OPENFILESLIMIT = 600, OPENSOCKETSLIMIT = 4, COUNTDOWN = 6;
+        private static TimeSpan FREEZEDURATION = TimeSpan.FromMinutes(3);
         private static DatePlot plot;
 
         private async Task Start()
@@ -39,7 +41,8 @@ namespace MopsKiller
                 using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140).OrderByDescending(x => x.WorkingSet64).First())
                 {
                     int openSockets = GetCloseWaitSockets();
-                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {(MopsBot.WorkingSet64/1024)/1024}, Runtime: {(DateTime.Now - MopsBot.StartTime).ToString(@"h\h\:m\m\:s\s")}, LogEntry: {(DateTime.Now - GetLastLogEntry()).ToString(@"m\m\:s\s")} ago");
+                    long ram = (MopsBot.WorkingSet64/1024)/1024;
+                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {ram}, Runtime: {(DateTime.Now - MopsBot.StartTime).ToString(@"h\h\:m\m\:s\s")}, LogEntry: {(DateTime.Now - GetLastLogEntry()).ToString(@"m\m\:s\s")} ago");
 
                     //Reset plot if 1 day old
                     if(plot.PlotDataPoints.Count > 23040) plot = new DatePlot("MopsKiller", relativeTime: false, multipleLines: true);
@@ -62,19 +65,24 @@ namespace MopsKiller
                         COUNTDOWN = 6;
                     }
 
-                    if (OpenFilesCount == MopsBot.HandleCount)
+                    if (RAM == ram)
                     {
-                        if (++OpenFilesRepetition >= REPETITIONTHRESHOLD)
+                        if (++RAMRepetition >= REPETITIONTHRESHOLD)
                         {
                             Console.WriteLine("\nShutting down due to 10 repetitions!");
                             MopsBot.Kill();
                         }
                     }
-
                     else
-                        OpenFilesRepetition = 0;
+                        RAMRepetition = 0;
+
+                    if((DateTime.Now - GetLastLogEntry()) >= FREEZEDURATION && RAMRepetition >= 6){
+                        Console.WriteLine("\nShutting down due >= 3m log freeze!");
+                        MopsBot.Kill();
+                    }
 
                     OpenFilesCount = MopsBot.HandleCount;
+                    RAM = ram;
 
                     if(openSockets > 0){
                         //CloseCloseWaitSockets();

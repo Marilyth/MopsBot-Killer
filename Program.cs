@@ -42,7 +42,7 @@ namespace MopsKiller
                 {
                     int openSockets = GetCloseWaitSockets();
                     long ram = (MopsBot.WorkingSet64/1024)/1024;
-                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {ram}, Runtime: {(DateTime.Now - MopsBot.StartTime).ToString(@"h\h\:m\m\:s\s")}, LogEntry: {(DateTime.Now - GetLastLogEntry()).ToString(@"m\m\:s\s")} ago");
+                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {ram}, Runtime: {(DateTime.Now - MopsBot.StartTime).ToString(@"h\h\:m\m\:s\s")}, LogEntry: {(DateTime.Now - GetLastLogEntry()).ToString(@"m\m\:s\s")} ago, Heartbeat: {(DateTime.Now - GetLastHeartbeat()).ToString(@"m\m\:s\s")} ago");
 
                     //Reset plot if 1 day old
                     if(plot.PlotDataPoints.Count > 23040) plot = new DatePlot("MopsKiller", relativeTime: false, multipleLines: true);
@@ -115,6 +115,23 @@ namespace MopsKiller
 
         private DateTime GetLastLogEntry(){
             return File.GetLastWriteTime("/usr/applications/MopsBot/mopsdata/log");
+        }
+
+        private DateTime GetLastHeartbeat(){
+            using (var prc = new System.Diagnostics.Process())
+            {
+                prc.StartInfo.RedirectStandardOutput = true;
+                prc.StartInfo.FileName = "/bin/bash";
+                prc.StartInfo.Arguments = $"-c \"read_mopslog | grep -B 2 Heartbeat | grep Verbose | tail -n 1\"";
+
+                prc.Start();
+
+                string time = prc.StandardOutput.ReadToEnd();
+
+                prc.WaitForExit();
+
+                return DateTime.Parse(string.Join("", time.Skip(13)));
+            }
         }
 
         private void CloseCloseWaitSockets(){

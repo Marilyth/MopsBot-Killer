@@ -20,8 +20,7 @@ namespace MopsKiller
         //Open file handling
         private int ProcessId, OpenFilesCount, RAMRepetition, LimitExceededCount;
         private long RAM;
-        private static int REPETITIONTHRESHOLD = 20, OPENFILESLIMIT = 600, OPENSOCKETSLIMIT = 4, COUNTDOWN = 6;
-        private static TimeSpan FREEZEDURATION = TimeSpan.FromMinutes(3);
+        private static int REPETITIONTHRESHOLD = 20, OPENFILESLIMIT = 1000, OPENSOCKETSLIMIT = 4, COUNTDOWN = 6;
         private static DatePlot plot;
 
         private async Task Start()
@@ -42,7 +41,7 @@ namespace MopsKiller
                 {
                     int openSockets = GetCloseWaitSockets();
                     long ram = (MopsBot.WorkingSet64/1024)/1024;
-                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {ram}, Runtime: {(DateTime.Now - MopsBot.StartTime).ToString(@"h\h\:m\m\:s\s")}, LogEntry: {(DateTime.Now - GetLastLogEntry()).ToString(@"m\m\:s\s")} ago, Heartbeat: {(DateTime.Now - GetLastHeartbeat()).ToString(@"m\m\:s\s")} ago");
+                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {ram}, Runtime: {(DateTime.Now - MopsBot.StartTime).ToString(@"h\h\:m\m\:s\s")}, Heartbeat: {(DateTime.Now - GetLastHeartbeat()).ToString(@"m\m\:s\s")} ago");
 
                     //Reset plot if 1 day old
                     if(plot.PlotDataPoints.Count > 23040) plot = new DatePlot("MopsKiller", relativeTime: false, multipleLines: true);
@@ -65,7 +64,7 @@ namespace MopsKiller
                         COUNTDOWN = 6;
                     }
 
-                    if (RAM == ram)
+                    /*if (RAM == ram)
                     {
                         if (++RAMRepetition >= REPETITIONTHRESHOLD)
                         {
@@ -78,6 +77,11 @@ namespace MopsKiller
 
                     if((DateTime.Now - GetLastLogEntry()) >= FREEZEDURATION && RAMRepetition >= 6){
                         Console.WriteLine("\nShutting down due >= 3m log freeze!");
+                        MopsBot.Kill();
+                    }*/
+
+                    if((DateTime.Now - GetLastHeartbeat()) >= TimeSpan.FromMinutes(1.5)){
+                        Console.WriteLine("\nShutting down due to no heartbeat!");
                         MopsBot.Kill();
                     }
 

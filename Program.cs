@@ -80,7 +80,7 @@ namespace MopsKiller
                         MopsBot.Kill();
                     }*/
 
-                    if((DateTime.Now - GetLastHeartbeat()) >= TimeSpan.FromMinutes(1.5)){
+                    if((DateTime.Now - GetLastHeartbeat()) >= TimeSpan.FromMinutes(1.5) && (DateTime.Now - MopsBot.StartTime) >= TimeSpan.FromMinutes(1.5)){
                         Console.WriteLine("\nShutting down due to no heartbeat!");
                         MopsBot.Kill();
                     }

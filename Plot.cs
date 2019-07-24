@@ -37,7 +37,7 @@ namespace MopsKiller
             viewerChart = new PlotModel();
             viewerChart.TextColor = OxyColor.FromRgb(175, 175, 175);
             viewerChart.PlotAreaBorderThickness = new OxyThickness(0);
-            var valueAxisY = new OxyPlot.Axes.LinearAxis
+            var valueAxisY = new OxyPlot.Axes.TimeSpanAxis
             {
                 Position = OxyPlot.Axes.AxisPosition.Left,
                 TicklineColor = OxyColor.FromRgb(125, 125, 155),
@@ -76,7 +76,7 @@ namespace MopsKiller
                 foreach (var dataPoint in PlotDataPoints)
                 {
                     if(!MultipleLines) AddValue(dataPoint.Key, dataPoint.Value.Value, DateTimeAxis.ToDateTime(dataPoint.Value.Key), false, relative);
-                    else AddValueSeperate(dataPoint.Key, dataPoint.Value.Value, DateTimeAxis.ToDateTime(dataPoint.Value.Key), false, relative);
+                    else AddValueSeperate(dataPoint.Key, TimeSpanAxis.ToTimeSpan(dataPoint.Value.Value), DateTimeAxis.ToDateTime(dataPoint.Value.Key), false, relative);
                 }
             }
         }
@@ -132,13 +132,13 @@ namespace MopsKiller
             }
         }
 
-        public void AddValueSeperate(string name, double viewerCount, DateTime? xValue = null, bool savePlot = true, bool relative = true){
+        public void AddValueSeperate(string name, TimeSpan heartbeat, DateTime? xValue = null, bool savePlot = true, bool relative = true){
             if (xValue == null) xValue = DateTime.UtcNow;
             if (StartTime == null) StartTime = xValue;
             var relativeXValue = relative ? new DateTime(1970, 01, 01).Add((xValue - StartTime).Value) : xValue;
 
             if (lineSeries.FirstOrDefault(x => x.Title.Equals(name)) != null)
-                lineSeries.FirstOrDefault(x => x.Title.Equals(name)).Points.Add(new DataPoint(DateTimeAxis.ToDouble(relativeXValue), viewerCount));
+                lineSeries.FirstOrDefault(x => x.Title.Equals(name)).Points.Add(new DataPoint(DateTimeAxis.ToDouble(relativeXValue), TimeSpanAxis.ToDouble(heartbeat)));
 
             else
             {
@@ -157,14 +157,14 @@ namespace MopsKiller
                     series.Title = name;
 
                 series.StrokeThickness = 3;
-                series.Points.Add(new DataPoint(DateTimeAxis.ToDouble(relativeXValue), viewerCount));
+                series.Points.Add(new DataPoint(DateTimeAxis.ToDouble(relativeXValue), TimeSpanAxis.ToDouble(heartbeat)));
                 viewerChart.Series.Add(series);
                 lineSeries.Add(series);
             }
 
             if (savePlot)
             {
-                PlotDataPoints.Add(new KeyValuePair<string, KeyValuePair<double, double>>(name, new KeyValuePair<double, double>(DateTimeAxis.ToDouble(xValue), viewerCount)));
+                PlotDataPoints.Add(new KeyValuePair<string, KeyValuePair<double, double>>(name, new KeyValuePair<double, double>(DateTimeAxis.ToDouble(xValue), TimeSpanAxis.ToDouble(heartbeat))));
             }
         }
 

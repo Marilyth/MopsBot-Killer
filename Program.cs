@@ -40,15 +40,15 @@ namespace MopsKiller
                 using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140).OrderByDescending(x => x.WorkingSet64).First())
                 {
                     int openSockets = GetCloseWaitSockets();
+                    TimeSpan heartbeat = DateTime.Now - GetLastHeartbeat();
+                    TimeSpan runtime = DateTime.Now - MopsBot.StartTime;
                     long ram = (MopsBot.WorkingSet64/1024)/1024;
-                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {ram}, Runtime: {(DateTime.Now - MopsBot.StartTime).ToString(@"h\h\:m\m\:s\s")}, Heartbeat: {(DateTime.Now - GetLastHeartbeat()).ToString(@"m\m\:s\s")} ago");
+                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {ram}, Runtime: {(runtime).ToString(@"h\h\:m\m\:s\s")}, Heartbeat: {heartbeat.ToString(@"m\m\:s\s")} ago");
 
                     //Reset plot if 1 day old
                     if(plot.PlotDataPoints.Count > 23040) plot = new DatePlot("MopsKiller", relativeTime: false, multipleLines: true);
-                    plot.AddValueSeperate("RAM", (MopsBot.WorkingSet64/1024)/1024, relative: false);
-                    plot.AddValueSeperate("Handles", MopsBot.HandleCount, relative: false);
-                    plot.AddValueSeperate("Waiting-Sockets", openSockets, relative: false);
-                    plot.AddValueSeperate("Threads", MopsBot.Threads.Count, relative: false);
+                    plot.AddValueSeperate("Runtime", runtime, relative: false);
+                    plot.AddValueSeperate("Heartbeat", heartbeat, relative: false);
                     plot.DrawPlot();
 
                     if (MopsBot.HandleCount >= OPENFILESLIMIT /*|| openSockets >= OPENSOCKETSLIMIT*/)
@@ -56,9 +56,9 @@ namespace MopsKiller
                         if(--COUNTDOWN == 0){
                             Console.WriteLine($"\nShutting down due to {MopsBot.HandleCount} open files / {openSockets} open sockets!");
                             MopsBot.Kill();
-                            plot.AddValueSeperate("Mops-Killed", 0, relative: false);
-                            plot.AddValueSeperate("Mops-Killed", MopsBot.HandleCount, relative: false);
-                            plot.AddValueSeperate("Mops-Killed", 0, relative: false);
+                            plot.AddValueSeperate("Mops-Killed", TimeSpan.FromMilliseconds(1), relative: false);
+                            plot.AddValueSeperate("Mops-Killed", runtime, relative: false);
+                            plot.AddValueSeperate("Mops-Killed", TimeSpan.FromMilliseconds(1), relative: false);
                         }
                     } else {
                         COUNTDOWN = 6;

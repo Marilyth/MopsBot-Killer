@@ -48,7 +48,7 @@ namespace MopsKiller
                     //Reset plot if 1 day old
                     if(plot.PlotDataPoints.Count > 23040) plot = new DatePlot("MopsKiller", relativeTime: false, multipleLines: true);
                     plot.AddValueSeperate("Runtime", runtime, relative: false);
-                    plot.AddValueSeperate("Heartbeat", heartbeat, relative: false);
+                    plot.AddValueSeperate("Heartbeat", heartbeat.Multiply(100), relative: false);
                     plot.DrawPlot();
 
                     if (MopsBot.HandleCount >= OPENFILESLIMIT /*|| openSockets >= OPENSOCKETSLIMIT*/)

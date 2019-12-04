@@ -20,7 +20,7 @@ namespace MopsKiller
         //Open file handling
         private int ProcessId, OpenFilesCount, RAMRepetition, LimitExceededCount;
         private long RAM;
-        private static int REPETITIONTHRESHOLD = 20, OPENFILESLIMIT = 1000, OPENSOCKETSLIMIT = 4, COUNTDOWN = 6;
+        private static int REPETITIONTHRESHOLD = 20, OPENFILESLIMIT = 3000, OPENSOCKETSLIMIT = 4, COUNTDOWN = 6;
         private static DatePlot plot;
 
         private async Task Start()
@@ -37,7 +37,7 @@ namespace MopsKiller
         {
             try
             {
-                using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 140).OrderByDescending(x => x.WorkingSet64).First())
+                using (var MopsBot = System.Diagnostics.Process.GetProcessesByName("dotnet").Where(x => x.Id != ProcessId && x.HandleCount > 100).OrderByDescending(x => x.WorkingSet64).First())
                 {
                     int openSockets = GetCloseWaitSockets();
                     TimeSpan heartbeat = DateTime.Now - GetLastHeartbeat();

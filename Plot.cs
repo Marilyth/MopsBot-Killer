@@ -40,7 +40,7 @@ namespace MopsKiller
             viewerChart = new PlotModel();
             viewerChart.TextColor = OxyColor.FromRgb(175, 175, 175);
             viewerChart.PlotAreaBorderThickness = new OxyThickness(0);
-            var valueAxisY = new OxyPlot.Axes.LinearAxis
+            var valueAxisY = new OxyPlot.Axes.TimeSpanAxis
             {
                 Position = OxyPlot.Axes.AxisPosition.Left,
                 TicklineColor = OxyColor.FromRgb(125, 125, 155),
@@ -259,27 +259,8 @@ namespace MopsKiller
         /// Forces r, g or b to be bright enough for darkmode
         public static OxyColor StringToColour(string name)
         {
-            int[] colour = { 0, 0, 0 };
-            foreach (char c in name)
-            {
-                colour[0] = (((int)c * (colour[0]) + 1) % 105);
-            }
-            colour[0] += 150;
-            for (int i = 1; i < 3; i++)
-            {
-                colour[i] = colour[i - 1];
-                foreach (char c in name)
-                {
-                    colour[i] = (((int)c * (colour[i]) + 1) % 255);
-                }
-            }
-            int firstPos = colour[0] % 3;
-            int tempColour = colour[firstPos];
-            colour[firstPos] = colour[0];
-            colour[0] = tempColour;
-
-            var oxycolour = OxyColor.FromRgb((byte)colour[0], (byte)colour[1], (byte)colour[2]);
-            return oxycolour;
+            if(name.Contains("Heartbeat")) return OxyColor.FromRgb(238, 38, 59);
+            else return OxyColor.FromRgb(117, 64, 191);
         }
 
         public void Dispose()

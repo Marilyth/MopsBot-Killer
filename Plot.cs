@@ -6,17 +6,12 @@ using System.Text;
 using OxyPlot;
 using OxyPlot.Axes;
 using System.Threading.Tasks;
-using MongoDB;
-using MongoDB.Driver;
-using MongoDB.Bson.Serialization.Options;
-using MongoDB.Bson.Serialization.Attributes;
 
 namespace MopsKiller
 {
     /// <summary>
     /// A Class that handles drawing plots.
     /// </summary>
-    [BsonIgnoreExtraElements]
     public class DatePlot
     {
         private PlotModel viewerChart;
@@ -26,7 +21,6 @@ namespace MopsKiller
         public List<KeyValuePair<string, KeyValuePair<double, double>>> PlotDataPoints;
         private DateTime? StartTime;
 
-        [BsonId]
         public string ID;
         public bool MultipleLines;
 

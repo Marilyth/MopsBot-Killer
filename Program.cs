@@ -47,8 +47,8 @@ namespace MopsKiller
 
                     //Reset plot if 1 day old
                     if(plot.PlotDataPoints.Count > 23040) plot = new DatePlot("MopsKiller", relativeTime: false, multipleLines: true);
-                    plot.AddValueSeperate("Runtime", runtime, relative: false);
-                    plot.AddValueSeperate("Heartbeat", TimeSpan.FromSeconds(heartbeat.TotalSeconds*60), relative: false);
+                    plot.AddValueSeperate("Runtime", OxyPlot.Axes.DateTimeAxis.ToDouble(runtime), relative: false);
+                    plot.AddValueSeperate("Heartbeat", OxyPlot.Axes.DateTimeAxis.ToDouble(TimeSpan.FromSeconds(heartbeat.TotalSeconds*60)), relative: false);
                     plot.DrawPlot();
 
                     if (MopsBot.HandleCount >= OPENFILESLIMIT /*|| openSockets >= OPENSOCKETSLIMIT*/)
@@ -56,9 +56,9 @@ namespace MopsKiller
                         if(--COUNTDOWN == 0){
                             Console.WriteLine($"\nShutting down due to {MopsBot.HandleCount} open files / {openSockets} open sockets!");
                             MopsBot.Kill();
-                            plot.AddValueSeperate("Mops-Killed", TimeSpan.FromMilliseconds(1), relative: false);
-                            plot.AddValueSeperate("Mops-Killed", runtime, relative: false);
-                            plot.AddValueSeperate("Mops-Killed", TimeSpan.FromMilliseconds(1), relative: false);
+                            plot.AddValueSeperate("Mops-Killed", OxyPlot.Axes.DateTimeAxis.ToDouble(TimeSpan.FromMilliseconds(1)), relative: false);
+                            plot.AddValueSeperate("Mops-Killed", OxyPlot.Axes.DateTimeAxis.ToDouble(runtime), relative: false);
+                            plot.AddValueSeperate("Mops-Killed", OxyPlot.Axes.DateTimeAxis.ToDouble(TimeSpan.FromMilliseconds(1)), relative: false);
                         }
                     } else {
                         COUNTDOWN = 6;

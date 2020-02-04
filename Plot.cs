@@ -193,14 +193,14 @@ namespace MopsKiller
             var yaxis = viewerChart.Axes.First(x => x.Position == OxyPlot.Axes.AxisPosition.Left);
             var max = areaSeries.Max(x => x.Points.Max(y => y.X));
             var min = areaSeries.Min(x => x.Points.Min(y => y.X));
-            var ymin = areaSeries.Min(x => x.Points.Min(y => y.Y));
+            var ymin = 0;
             foreach (var series in areaSeries)
             {
                 series.ConstantY2 = ymin;
             }
             axis.AbsoluteMaximum = max;
             axis.AbsoluteMinimum = min;
-            yaxis.AbsoluteMinimum = ymin;
+            yaxis.AbsoluteMinimum = 0;
         }
 
         public DataPoint? SetMaximumLine()

@@ -43,7 +43,8 @@ namespace MopsKiller
                     TimeSpan heartbeat = DateTime.Now - GetLastHeartbeat();
                     TimeSpan runtime = DateTime.Now - MopsBot.StartTime;
                     long ram = (MopsBot.WorkingSet64/1024)/1024;
-                    Console.WriteLine($"{System.DateTime.Now} MopsBot, {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {ram}, Runtime: {(runtime).ToString(@"h\h\:m\m\:s\s")}, Heartbeat: {heartbeat.ToString(@"m\m\:s\s")} ago");
+                    double cpu = GetCPUUsage(MopsBot.Id);
+                    Console.WriteLine($"{System.DateTime.Now} {MopsBot.ProcessName}: {MopsBot.Id}, handles: {MopsBot.HandleCount}, waiting-sockets: {openSockets}, threads: {MopsBot.Threads.Count}, RAM: {ram}, CPU: {cpu}, Runtime: {(runtime).ToString(@"h\h\:m\m\:s\s")}, Heartbeat: {heartbeat.ToString(@"m\m\:s\s")} ago");
 
                     //Reset plot if 1 day old
                     if(plot.PlotDataPoints.Count > 23040) plot = new DatePlot("MopsKiller", relativeTime: false, multipleLines: true);
@@ -135,6 +136,23 @@ namespace MopsKiller
                 prc.WaitForExit();
 
                 return DateTime.Parse(string.Join("", time.Skip(13)));
+            }
+        }
+
+        private double GetCPUUsage(int id){
+            using (var prc = new System.Diagnostics.Process())
+            {
+                prc.StartInfo.RedirectStandardOutput = true;
+                prc.StartInfo.FileName = "/bin/bash";
+                prc.StartInfo.Arguments = "-c \"top -b -n 2 -d 0.2 -p " + id + " | tail -1 | awk '{print $9}'\"";
+
+                prc.Start();
+
+                string usage = prc.StandardOutput.ReadToEnd();
+
+                prc.WaitForExit();
+
+                return double.Parse(usage);
             }
         }
 
